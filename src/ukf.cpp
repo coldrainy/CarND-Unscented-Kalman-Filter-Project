@@ -235,7 +235,7 @@ void UKF::Prediction(double delta_t) {
 
     x_ = Xsig_pred_*weights_;
 
-    P_.fill(0);
+    P_.fill(0); //This handle is important.You should fill zero every time before you predict the P matrix;
     for(int i=0;i<2*n_aug_+1;i++){
         VectorXd diff = Xsig_pred_.col(i)-x_;
         while (diff(3)> M_PI) diff(3)-=2*M_PI;
@@ -281,11 +281,11 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
     MatrixXd T(n_x_,2);
     T.fill(0);
     for(int i=0;i<2*n_aug_+1;i++){
-        VectorXd x_diff = Xsig_pred_.col(i) - x_;
+        VectorXd x_diff = Xsig_pred_.col(i) - x_;// don't forget the normalization every time the angle in the substraction.
         if(x_diff(3)>M_PI) x_diff(3) -=2* M_PI;
         if(x_diff(3)<-M_PI) x_diff(3) +=2* M_PI;
         VectorXd z_diff = Zsig.col(i) - z_pred;
-        T = T+weights_(i)*x_diff*z_diff.transpose();
+        T = T+weights_(i)*x_diff*z_diff.transpose();// don't forget the weights here.
     }
 
     MatrixXd K(n_x_,2);
